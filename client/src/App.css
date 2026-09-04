@@ -1,0 +1,1039 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap");
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", sans-serif !important;
+  color: #000000;
+  background-color: #ffffff;
+  letter-spacing: 1px;
+  overflow-x: hidden;
+}
+
+/* ==========================================
+   1. ANNOUNCEMENT BAR
+   ========================================== */
+.announcement-bar {
+  background-color: #0b3c26 !important;
+  color: #ffffff !important;
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  padding: 8px 0;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1060;
+}
+
+.ticker-wrapper {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker 25s linear infinite;
+}
+
+.ticker-item {
+  display: inline-block;
+  padding: 0 30px;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ==========================================
+   HEADER WRAPPER & ANNOUNCEMENT BAR
+   ========================================== */
+
+/* Main Header Wrapper ko absolute banayein taake hero section background par overlap ho */
+.header-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* ==========================================
+   ANNOUNCEMENT BAR STYLING
+   ========================================== */
+.announcement-bar {
+  background-color: #0e382c; /* Original Baroque Dark Green */
+  color: #ffffff;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* ==========================================
+   SOLID WHITE STICKY NAVBAR
+   ========================================== */
+.custom-sticky-navbar {
+  background-color: #ffffff !important; /* Pure Solid White */
+  position: sticky !important; /* Page scroll hone par sath move hoga */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 14px 0 !important;
+  border-bottom: 1px solid #eeeeee; /* Bottom subtle border */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Soft premium shadow */
+}
+
+/* Original Dark Logo Fix */
+.brand-logo-img {
+  max-height: 28px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  filter: none !important; /* Black Original Color */
+}
+
+/* Dark Icons Fix */
+.nav-icon-btn,
+.navbar-toggler-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #000000 !important; /* Clean Black Color */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.nav-icon-btn:hover,
+.navbar-toggler-btn:hover {
+  transform: scale(1.15);
+  opacity: 0.7;
+}
+
+/* Cart Badge Styling */
+.nav-icon-btn.position-relative {
+  position: relative !important;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background-color: #000000; /* Black Background */
+  color: #ffffff; /* White Count Number */
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ==========================================
+   3. HERO BANNER
+   ========================================== */
+.hero-banner-container,
+.hero-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  background-image: url("https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1920&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.15) 50%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 70px;
+  color: #ffffff;
+  z-index: 2;
+}
+
+.hero-sub-title {
+  font-size: 13px;
+  letter-spacing: 4px;
+  font-weight: 400;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.hero-main-title,
+.hero-title {
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+
+.hero-shop-btn,
+.hero-btn {
+  display: inline-block;
+  background-color: transparent;
+  color: #ffffff !important;
+  border: 1px solid #ffffff;
+  padding: 12px 38px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-decoration: none;
+  text-transform: uppercase;
+  margin-top: 18px;
+  cursor: pointer !important;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(2px);
+}
+
+.hero-shop-btn:hover,
+.hero-btn:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* ==========================================
+   HOME CATEGORIES SECTIONS (BAROQUE STYLE)
+   ========================================== */
+
+.section-title {
+  font-size: 1.25rem;
+  letter-spacing: 2.5px;
+  color: #000000;
+  font-weight: 400;
+}
+
+/* Image Card Container */
+.cat-card-box {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 2px;
+  background-color: #f7f7f7;
+}
+
+.cat-img {
+  width: 100%;
+  height: 100%;
+  max-height: 680px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.banner-img {
+  max-height: 520px;
+  object-position: top center;
+}
+
+/* Hover Zoom Effect */
+.cat-card-box:hover .cat-img {
+  transform: scale(1.03);
+}
+
+/* Overlay Buttons */
+.cat-btn {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 10px 28px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  white-space: nowrap;
+}
+
+.cat-btn:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Dual Buttons (Ready to Wear & Essentials) */
+.dual-btn-wrapper {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.dual-btn-wrapper .cat-btn {
+  position: static;
+  transform: none;
+}
+
+.btn-light-style {
+  background-color: #e2e2e2;
+  color: #000000;
+}
+
+.btn-green-style {
+  background-color: #0e382c;
+  color: #ffffff;
+}
+
+.btn-green-style:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* ==========================================
+   5. BAROQUE 2-COLUMN MENU DRAWER
+   ========================================== */
+.offcanvas.baroque-mega-drawer {
+  width: 580px !important;
+  max-width: 95vw !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.offcanvas-body {
+  padding: 0 !important;
+}
+
+.baroque-drawer-left {
+  width: 280px;
+  min-width: 260px;
+  border-right: 1px solid #eeeeee;
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.drawer-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #000000;
+  cursor: pointer !important;
+  padding: 5px 10px;
+}
+
+.drawer-menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #222222;
+  text-transform: uppercase;
+  cursor: pointer !important;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.drawer-menu-item:hover,
+.drawer-menu-item.active {
+  color: #000000;
+  font-weight: 600;
+  background-color: #fafafa;
+}
+
+.drawer-bottom-section {
+  padding: 20px 24px;
+  border-top: 1px solid #eeeeee;
+}
+
+.drawer-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.drawer-social-icons a {
+  color: #000000 !important;
+  cursor: pointer !important;
+}
+
+.drawer-country-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 400;
+  color: #333333;
+  text-transform: uppercase;
+  cursor: pointer !important;
+}
+
+.baroque-drawer-right {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 20px 30px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.drawer-submenu-item {
+  display: block;
+  padding: 16px 0;
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 400;
+  color: #222222 !important;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  border-bottom: 1px solid #f2f2f2;
+  cursor: pointer !important;
+  transition: padding-left 0.2s ease;
+}
+
+.drawer-submenu-item:hover {
+  color: #000000 !important;
+  padding-left: 8px;
+  font-weight: 600;
+}
+
+/* Mobile Responsive */
+@media (max-width: 576px) {
+  .offcanvas.baroque-mega-drawer {
+    width: 100% !important;
+  }
+  .baroque-drawer-left {
+    width: 50%;
+    min-width: unset;
+  }
+  .hero-main-title {
+    font-size: 26px;
+  }
+}
+
+/* ==========================================
+   6. COLLECTION PAGE & SIDEBAR STYLES
+   ========================================== */
+.collection-page-wrapper {
+  background-color: #ffffff;
+  padding-bottom: 80px;
+}
+
+.collection-main-title {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+
+.collection-subtitle {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #666;
+}
+
+.filter-top-bar {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: #333;
+}
+
+.sort-select {
+  font-size: 11px;
+  letter-spacing: 1px;
+  border-radius: 0;
+  border: 1px solid #e0e0e0;
+  padding: 6px 12px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none !important;
+}
+
+/* Sidebar Accordion Filters */
+.collection-sidebar .filter-heading {
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.filter-accordion .accordion-item {
+  border: none;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.filter-accordion .accordion-button {
+  background: transparent !important;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: #000000 !important;
+  padding: 14px 0;
+  box-shadow: none !important;
+}
+
+.filter-accordion .accordion-body {
+  padding: 0 0 15px 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.filter-accordion .form-check-label {
+  letter-spacing: 1px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* Collection Product Cards */
+.collection-product-card {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.product-img-box {
+  position: relative;
+  width: 100%;
+  padding-top: 135%; /* 3:4 Aspect Ratio */
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+.product-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.collection-product-card:hover .product-img {
+  transform: scale(1.05);
+}
+
+/* Wishlist Heart Icon */
+.wishlist-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 5;
+  transition: transform 0.2s ease;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Quick Add Button */
+.quick-add-btn {
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  padding: 10px 0;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer !important;
+  transition: bottom 0.3s ease;
+}
+
+.collection-product-card:hover .quick-add-btn {
+  bottom: 0;
+}
+
+.product-category {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #888;
+}
+
+.product-title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: #111;
+}
+
+.product-price {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: #000;
+}
+
+/* ==========================================
+   SOLID NAVBAR FOR COLLECTION PAGE
+   ========================================== */
+.custom-navbar.solid-white-navbar {
+  background-color: #ffffff !important;
+  position: sticky !important;
+  top: 0;
+  z-index: 1040;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.solid-white-navbar .brand-logo-img {
+  filter: brightness(0) !important; /* Always black logo on collection page */
+}
+
+.solid-white-navbar .nav-icon-btn,
+.solid-white-navbar .navbar-toggler-btn {
+  color: #000000 !important; /* Always black icons */
+}
+
+.solid-white-navbar .cart-badge {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================
+   PLUS (+) BUTTON & PRODUCT CARD STYLES
+   ========================================== */
+.plus-add-btn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #000000;
+  cursor: pointer !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 5;
+  transition: all 0.2s ease;
+}
+
+.plus-add-btn:hover {
+  background-color: #000000;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* ==========================================
+   CART DRAWER STYLES
+   ========================================== */
+.cart-drawer-wrapper {
+  width: 380px !important;
+  max-width: 90vw !important;
+}
+
+.cart-drawer-title {
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.cart-item-img {
+  width: 65px;
+  height: 85px;
+  object-fit: cover;
+}
+
+.cart-item-title {
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.cart-item-price {
+  font-size: 12px;
+}
+
+.quantity-controls {
+  border: 1px solid #e0e0e0;
+  display: inline-flex;
+}
+
+.qty-btn {
+  background: transparent;
+  border: none;
+  padding: 2px 8px;
+  cursor: pointer !important;
+}
+
+.qty-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.qty-value {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.remove-item-btn {
+  cursor: pointer !important;
+  background: transparent;
+}
+
+/* ==========================================
+   FOOTER STYLES
+   ========================================== */
+.baroque-footer {
+  font-family: "Montserrat", sans-serif;
+}
+
+.footer-heading {
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.footer-links a {
+  color: #555555;
+  text-decoration: none;
+  line-height: 2;
+  letter-spacing: 1px;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #000000;
+}
+
+.footer-socials a {
+  color: #000000;
+  font-size: 15px;
+  transition: transform 0.2s ease;
+}
+
+.footer-socials a:hover {
+  transform: translateY(-3px);
+}
+
+/* ==========================================
+   IMAGE HOVER EFFECT (IMAGE 1 TO IMAGE 2)
+   ========================================== */
+.product-img-box {
+  position: relative;
+  width: 100%;
+  padding-top: 135%; /* 3:4 Aspect Ratio */
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+.product-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    opacity 0.4s ease-in-out,
+    transform 0.5s ease;
+}
+
+/* Primary Image is visible by default */
+.product-img.primary-img {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* Hover Image is hidden by default */
+.product-img.hover-img {
+  opacity: 0;
+  z-index: 2;
+}
+
+/* When Card is Hovered: Show Hover Image, Hide Primary Image */
+.collection-product-card:hover .product-img.hover-img {
+  opacity: 1;
+}
+
+.collection-product-card:hover .product-img {
+  transform: scale(1.04);
+}
+
+/* ==========================================
+   CATEGORY OVERLAY BUTTONS (BAROQUE STYLE)
+   ========================================== */
+
+/* Main Button Wrapper / Position */
+.cat-card-box {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Base Category Button */
+.cat-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  padding: 10px 24px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+}
+
+/* Button Hover State */
+.cat-btn:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+/* Dual Buttons Wrapper (Ready to Wear & Essentials) */
+.dual-btn-wrapper {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+/* Dual Buttons reset relative positioning */
+.dual-btn-wrapper .cat-btn {
+  position: static;
+  transform: none;
+}
+
+/* Variant: Grey Button Style (SHOP ALL) */
+.btn-light-style {
+  background-color: #f2f2f2;
+  color: #000000;
+  border: 1px solid #dcdcdc;
+}
+
+.btn-light-style:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+/* Variant: Dark Green Style (DUPATTAS) */
+.btn-green-style {
+  background-color: #0e382c;
+  color: #ffffff;
+  border: 1px solid #0e382c;
+}
+
+.btn-green-style:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+/* ==========================================
+   DROPDOWN SEARCH BAR (BELOW NAVBAR)
+   ========================================== */
+
+/* Navbar ke bilkul niche position karne ke liye */
+.dropdown-search-bar {
+  position: absolute;
+  top: 100%; /* Navbar ke bilkul niche aayega */
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  z-index: 99;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: slideDownFade 0.25s ease-out;
+}
+
+/* Smooth Slide Down Effect */
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input Styling */
+.search-input-field {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: #000000;
+  background: transparent;
+}
+
+.search-input-field::placeholder {
+  color: #999999;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+}
+
+/* Buttons Hover */
+.close-search-btn {
+  background: none;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.close-search-btn:hover {
+  transform: rotate(90deg);
+}
+
+/* Invisible overlay select box for smooth dropdown selection */
+.country-dropdown-select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.country-selector-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+/* ==========================================
+   COLLECTION PAGE & HOVER SWAP STYLES
+   ========================================== */
+
+/* Image Hover Swap Effect */
+.product-image-box {
+  position: relative;
+  cursor: pointer;
+}
+
+.product-image-box .front-img {
+  transition: opacity 0.4s ease-in-out;
+}
+
+.product-image-box .back-img {
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+
+/* Hover over Product Card shows Back Image */
+.product-card:hover .back-img {
+  opacity: 1;
+}
+
+/* Quick Add Button Slide Up Animation */
+.quick-add-btn {
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 2;
+}
+
+.product-card:hover .quick-add-btn {
+  transform: translateY(0);
+}
+
+/* Wishlist Button Hover */
+.wishlist-btn {
+  transition: transform 0.2s ease;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Custom Checkbox & Radio Styling */
+.custom-checkbox .form-check-input:checked,
+.custom-radio .form-check-input:checked {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.custom-checkbox .form-check-label,
+.custom-radio .form-check-label {
+  font-size: 0.8rem;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
+}
+
+.footer-link {
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #ffffff !important;
+  text-decoration: underline !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
