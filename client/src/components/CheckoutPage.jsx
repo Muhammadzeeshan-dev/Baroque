@@ -58,7 +58,6 @@ const CheckoutPage = ({ cart = [], currentUser, onUpdateQuantity, onRemoveItem, 
     setErrorMessage("");
     
     try {
-      // Backend Payload Preparation
       const orderPayload = {
         userEmail: formData.email,
         shippingAddress: {
@@ -75,8 +74,11 @@ const CheckoutPage = ({ cart = [], currentUser, onUpdateQuantity, onRemoveItem, 
         totalAmount: totalPKR,
       };
 
-      // Sending real request to backend server running on port 5001
-      const response = await fetch("http://localhost:5001/api/orders", {
+      const API_BASE_URL = window.location.hostname === "localhost" 
+        ? "http://localhost:5001/api" 
+        : "https://baroque-nqhm.onrender.com/api";
+
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +91,6 @@ const CheckoutPage = ({ cart = [], currentUser, onUpdateQuantity, onRemoveItem, 
       if (response.ok && data.success) {
         setIsProcessing(false);
         setOrderPlaced(true);
-        // Inform parent component if needed
         if (typeof onCompleteOrder === 'function') {
           onCompleteOrder(formData);
         }
@@ -141,14 +142,12 @@ const CheckoutPage = ({ cart = [], currentUser, onUpdateQuantity, onRemoveItem, 
           </h2>
         </div>
 
-        {/* Error Notification Alert */}
         {errorMessage && (
           <Alert variant="danger" className="rounded-0 small text-center mb-4">
             {errorMessage}
           </Alert>
         )}
 
-        {/* User Profile Display Banner */}
         {currentUser && (
           <div className="mb-4 p-3 border bg-light d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center gap-3">
@@ -163,7 +162,6 @@ const CheckoutPage = ({ cart = [], currentUser, onUpdateQuantity, onRemoveItem, 
         )}
 
         <Row className="gx-lg-5">
-          {/* Left Column: Form */}
           <Col lg={7} className="mb-5 mb-lg-0">
             <Form onSubmit={handleSubmit}>
               <div className="mb-4">
@@ -336,7 +334,6 @@ const CheckoutPage = ({ cart = [], currentUser, onUpdateQuantity, onRemoveItem, 
             </Form>
           </Col>
 
-          {/* Right Column: Order Summary */}
           <Col lg={5}>
             <div className="p-4 bg-light border sticky-top" style={{ top: "90px" }}>
               <h6 className="fw-bold text-uppercase mb-3 pb-2 border-bottom" style={{ fontSize: "0.85rem", letterSpacing: "1px" }}>
