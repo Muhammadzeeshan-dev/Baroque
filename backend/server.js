@@ -14,7 +14,7 @@ const app = express();
 
 // ===================== MIDDLEWARE =====================
 app.use(express.json());
-app.use(cors());
+app.use(cors()); // यह नेटलीफ़ाई फ्रंटएंड को कनेक्ट करने की अनुमति देता है
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const uploadDir = path.join(__dirname, "uploads");
@@ -751,7 +751,7 @@ app.delete("/api/users/:id", verifyToken, async (req, res) => {
 });
 
 // ===================== START SERVER =====================
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
