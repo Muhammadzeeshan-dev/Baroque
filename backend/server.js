@@ -1,3 +1,8 @@
+// ===================== DNS OVERRIDE (optional, remove if not needed) =====================
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+// ===================== LOAD ENV =====================
 require("dotenv").config();
 
 const express = require("express");
@@ -12,9 +17,30 @@ const bcrypt = require("bcryptjs");
 
 const app = express();
 
+// ===================== CORS DYNAMIC =====================
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:3000", // Netlify domain or local
+  "http://localhost:3001", // admin local
+  "http://localhost:3002", // admin fallback
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps, curl, postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 // ===================== MIDDLEWARE =====================
 app.use(express.json());
-app.use(cors());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const uploadDir = path.join(__dirname, "uploads");
@@ -28,14 +54,13 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ===================== MONGO DB =====================
-const MONGO_URI =
-  process.env.MONGO_URI ||
-  "mongodb+srv://muhammadzeeshan7864x56_db_user:BDBNyWDDUnt7vHg1@cluster0.bdx7ndd.mongodb.net/?appName=Cluster0";
-console.log(
-  "✅ MONGO_URI loaded (starts with:",
-  MONGO_URI.slice(0, 15) + "...",
-);
+// ===================== MONGO DB (ATLAS) =====================
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.error("❌ MONGO_URI is not defined in .env file");
+  process.exit(1);
+}
+console.log("✅ MONGO_URI loaded (starts with:", MONGO_URI.slice(0, 15) + "...)");
 
 mongoose
   .connect(MONGO_URI, {
@@ -48,53 +73,17 @@ mongoose
   })
   .catch((err) => {
     console.error("❌ MongoDB Connection Error:", err);
+    process.exit(1);
   });
 
-// ===================== NODEMAILER (FIXED) =====================
+// ===================== NODEMAILER =====================
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.EMAIL_PORT) || 587,
-  secure: process.env.EMAIL_SECURE === "true", // false for port 587
+  service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER || "ranazeshaan786456@gmail.com",
+    pass: process.env.EMAIL_PASS || "yrwb bxxk sxkv birx",
   },
-  tls: {
-    rejectUnauthorized: false,
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 15000,
 });
-
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ Nodemailer configuration error:", error);
-  } else {
-    console.log(
-      "✅ Nodemailer is ready to send emails from:",
-      process.env.EMAIL_USER,
-    );
-  }
-});
-
-// ===================== ADMIN NOTIFICATION HELPER =====================
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
-
-const sendAdminEmail = async (subject, htmlContent) => {
-  try {
-    await transporter.sendMail({
-      from: `"Baroque Store" <${process.env.EMAIL_USER}>`,
-      to: ADMIN_EMAIL,
-      subject: `[Admin] ${subject}`,
-      html: htmlContent,
-    });
-    console.log(`✅ Admin notification sent: ${subject}`);
-  } catch (err) {
-    console.error("❌ Failed to send admin email:", err.message);
-  }
-};
 
 // ===================== USER MODEL & SEED =====================
 const userSchema = new mongoose.Schema(
@@ -104,16 +93,12 @@ const userSchema = new mongoose.Schema(
     name: { type: String, default: "Admin" },
     role: { type: String, default: "admin" },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 const seedAdmin = async () => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      console.log("⏳ Waiting for DB connection...");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    }
     const adminExists = await User.findOne({ email: "admin@baroque.com" });
     if (!adminExists) {
       const hashed = await bcrypt.hash("admin123", 10);
@@ -127,7 +112,6 @@ const seedAdmin = async () => {
     }
   } catch (err) {
     console.log("⚠️ Seeding admin failed:", err.message);
-    setTimeout(seedAdmin, 5000);
   }
 };
 
@@ -219,7 +203,7 @@ app.post("/api/auth/forgot-password", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     resetOtpStore[email] = { otp, expiresAt: Date.now() + 10 * 60 * 1000 };
     const mailOptions = {
-      from: `"Baroque Store" <${process.env.EMAIL_USER}>`,
+      from: '"Baroque Store" <ranazeshaan786456@gmail.com>',
       to: email,
       subject: "Password Reset OTP - Baroque Admin",
       html: `<p>Your OTP is: <strong>${otp}</strong></p><p>Valid for 10 min.</p>`,
@@ -227,8 +211,8 @@ app.post("/api/auth/forgot-password", async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.json({ success: true, message: "OTP sent" });
   } catch (err) {
-    console.error("Forgot password email error:", err);
-    res.status(500).json({ message: "Failed to send OTP. Please try again." });
+    console.error(err);
+    res.status(500).json({ message: "Server error sending OTP" });
   }
 });
 
@@ -257,35 +241,23 @@ app.post("/api/auth/reset-password", async (req, res) => {
 
 // ===================== OTP ROUTES =====================
 const otpStore = {};
-
 app.post("/api/users/send-otp", async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email required" });
-    }
-
+    if (!email)
+      return res.status(400).json({ success: false, message: "Email required" });
     const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore[email] = generatedOtp;
-
     const mailOptions = {
-      from: `"Baroque Store" <${process.env.EMAIL_USER}>`,
+      from: '"Baroque Store" <ranazeshaan786456@gmail.com>',
       to: email,
       subject: "Your OTP - Baroque",
       text: `Your OTP is: ${generatedOtp}`,
     };
-
     await transporter.sendMail(mailOptions);
-    console.log(`✅ OTP sent to ${email}`);
     res.json({ success: true, message: "OTP sent" });
   } catch (err) {
-    console.error("❌ OTP email error:", err.message);
-    res.status(500).json({
-      success: false,
-      message: "Failed to send OTP. Please check email configuration.",
-    });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
@@ -302,22 +274,6 @@ app.post("/api/users/verify-otp", async (req, res) => {
   }
 });
 
-// ===================== TEST EMAIL ROUTE =====================
-app.get("/api/test-email", async (req, res) => {
-  try {
-    await transporter.sendMail({
-      from: `"Baroque Store" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      subject: "Test Email from Baroque",
-      text: "If you receive this, email configuration is working!",
-    });
-    res.send("✅ Test email sent successfully!");
-  } catch (err) {
-    console.error("Test email error:", err);
-    res.status(500).send("❌ Test email failed: " + err.message);
-  }
-});
-
 // ===================== PRODUCT SCHEMA & ROUTES =====================
 const productSchema = new mongoose.Schema(
   {
@@ -330,7 +286,7 @@ const productSchema = new mongoose.Schema(
     stock: { type: Number, default: 10 },
     isVisible: { type: Boolean, default: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 const Product =
   mongoose.models.Product || mongoose.model("Product", productSchema);
@@ -340,9 +296,7 @@ app.get("/api/products", async (req, res) => {
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error fetching products" });
+    res.status(500).json({ success: false, message: "Error fetching products" });
   }
 });
 
@@ -353,9 +307,7 @@ app.get("/api/products/visible", async (req, res) => {
     });
     res.json(products);
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error fetching products" });
+    res.status(500).json({ success: false, message: "Error fetching products" });
   }
 });
 
@@ -364,13 +316,9 @@ app.post("/api/admin/products", upload.single("image"), async (req, res) => {
     const { name, price, discount, description, category, stock, isVisible } =
       req.body;
     if (!name || !price)
-      return res
-        .status(400)
-        .json({ success: false, message: "Name & price required" });
+      return res.status(400).json({ success: false, message: "Name & price required" });
     if (!req.file)
-      return res
-        .status(400)
-        .json({ success: false, message: "Image required" });
+      return res.status(400).json({ success: false, message: "Image required" });
     const imagePath = `/uploads/${req.file.filename}`;
     const newProduct = new Product({
       name,
@@ -383,20 +331,7 @@ app.post("/api/admin/products", upload.single("image"), async (req, res) => {
       isVisible: isVisible !== undefined ? isVisible : true,
     });
     await newProduct.save();
-
-    await sendAdminEmail(
-      "New Product Added",
-      `<p>A new product has been added:</p>
-       <p><strong>Name:</strong> ${name}</p>
-       <p><strong>Price:</strong> $${price}</p>
-       <p><a href="${FRONTEND_URL}/products">View in Admin Panel</a></p>`,
-    );
-
-    res.status(201).json({
-      success: true,
-      message: "Product uploaded",
-      product: newProduct,
-    });
+    res.status(201).json({ success: true, message: "Product uploaded", product: newProduct });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -423,14 +358,8 @@ app.put("/api/admin/products/:id", upload.single("image"), async (req, res) => {
       new: true,
     });
     if (!updatedProduct)
-      return res
-        .status(404)
-        .json({ success: false, message: "Product not found" });
-    res.json({
-      success: true,
-      message: "Product updated",
-      product: updatedProduct,
-    });
+      return res.status(404).json({ success: false, message: "Product not found" });
+    res.json({ success: true, message: "Product updated", product: updatedProduct });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
   }
@@ -439,8 +368,7 @@ app.put("/api/admin/products/:id", upload.single("image"), async (req, res) => {
 app.delete("/api/admin/products/:id", async (req, res) => {
   try {
     const deleted = await Product.findByIdAndDelete(req.params.id);
-    if (!deleted)
-      return res.status(404).json({ success: false, message: "Not found" });
+    if (!deleted) return res.status(404).json({ success: false, message: "Not found" });
     res.json({ success: true, message: "Product deleted" });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -454,10 +382,9 @@ app.patch("/api/admin/products/:id/visibility", async (req, res) => {
     const product = await Product.findByIdAndUpdate(
       id,
       { isVisible },
-      { new: true },
+      { new: true }
     );
-    if (!product)
-      return res.status(404).json({ success: false, message: "Not found" });
+    if (!product) return res.status(404).json({ success: false, message: "Not found" });
     res.json({ success: true, message: "Visibility updated", product });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -474,7 +401,7 @@ const bannerSchema = new mongoose.Schema(
     isActive: { type: Boolean, default: true },
     order: { type: Number, default: 0 },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 const Banner = mongoose.models.Banner || mongoose.model("Banner", bannerSchema);
 
@@ -491,9 +418,7 @@ app.post("/api/admin/banners", upload.single("image"), async (req, res) => {
   try {
     const { title, subtitle, link, isActive, order } = req.body;
     if (!title || !req.file)
-      return res
-        .status(400)
-        .json({ success: false, message: "Title and image required" });
+      return res.status(400).json({ success: false, message: "Title and image required" });
     const imagePath = `/uploads/${req.file.filename}`;
     const newBanner = new Banner({
       title,
@@ -504,19 +429,7 @@ app.post("/api/admin/banners", upload.single("image"), async (req, res) => {
       order: order ? Number(order) : 0,
     });
     await newBanner.save();
-
-    await sendAdminEmail(
-      "New Banner Added",
-      `<p>A new banner has been created:</p>
-       <p><strong>Title:</strong> ${title}</p>
-       <p><a href="${FRONTEND_URL}/banners">View in Admin Panel</a></p>`,
-    );
-
-    res.status(201).json({
-      success: true,
-      message: "Banner uploaded",
-      banner: newBanner,
-    });
+    res.status(201).json({ success: true, message: "Banner uploaded", banner: newBanner });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
   }
@@ -540,14 +453,8 @@ app.put("/api/admin/banners/:id", upload.single("image"), async (req, res) => {
       new: true,
     });
     if (!updatedBanner)
-      return res
-        .status(404)
-        .json({ success: false, message: "Banner not found" });
-    res.json({
-      success: true,
-      message: "Banner updated",
-      banner: updatedBanner,
-    });
+      return res.status(404).json({ success: false, message: "Banner not found" });
+    res.json({ success: true, message: "Banner updated", banner: updatedBanner });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
   }
@@ -556,8 +463,7 @@ app.put("/api/admin/banners/:id", upload.single("image"), async (req, res) => {
 app.delete("/api/admin/banners/:id", async (req, res) => {
   try {
     const deleted = await Banner.findByIdAndDelete(req.params.id);
-    if (!deleted)
-      return res.status(404).json({ success: false, message: "Not found" });
+    if (!deleted) return res.status(404).json({ success: false, message: "Not found" });
     res.json({ success: true, message: "Banner deleted" });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
@@ -582,7 +488,7 @@ const orderSchema = new mongoose.Schema(
     orderStatus: { type: String, default: "Pending" },
     trackingId: { type: String },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
 
@@ -596,10 +502,7 @@ app.post("/api/orders", async (req, res) => {
       paymentMethod,
     } = req.body;
     if (!userEmail)
-      return res
-        .status(400)
-        .json({ success: false, message: "Email required" });
-
+      return res.status(400).json({ success: false, message: "Email required" });
     const trackingId = "TRK-" + Math.floor(100000 + Math.random() * 900000);
     const newOrder = new Order({
       userEmail,
@@ -613,34 +516,15 @@ app.post("/api/orders", async (req, res) => {
     await newOrder.save();
 
     const customerName = shippingAddress?.fullName || "Valued Customer";
-    const customerMail = {
-      from: `"Baroque Store" <${process.env.EMAIL_USER}>`,
+    const mailOptions = {
+      from: '"Baroque Store" <ranazeshaan786456@gmail.com>',
       to: userEmail,
       subject: "Order Confirmation - Baroque",
       html: `<p>Hi ${customerName}, your order is confirmed. Tracking ID: ${trackingId}</p>`,
     };
-    try {
-      await transporter.sendMail(customerMail);
-      console.log("✅ Order confirmation email sent to:", userEmail);
-    } catch (emailErr) {
-      console.error("❌ Order email failed:", emailErr.message);
-    }
-
-    const adminHtml = `
-      <p>A new order has been placed.</p>
-      <p><strong>Order ID:</strong> ${newOrder._id}</p>
-      <p><strong>Customer:</strong> ${customerName} (${userEmail})</p>
-      <p><strong>Total:</strong> $${totalAmount}</p>
-      <p><strong>Items:</strong> ${orderItems.length}</p>
-      <p><a href="${FRONTEND_URL}/orders">View in Admin Panel</a></p>
-    `;
-    await sendAdminEmail("New Order Placed", adminHtml);
-
-    res
-      .status(201)
-      .json({ success: true, message: "Order placed", order: newOrder });
+    await transporter.sendMail(mailOptions).catch(() => {});
+    res.status(201).json({ success: true, message: "Order placed", order: newOrder });
   } catch (err) {
-    console.error("Order error:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -657,17 +541,13 @@ app.get("/api/orders", async (req, res) => {
 app.delete("/api/orders/all", verifyToken, async (req, res) => {
   try {
     const result = await Order.deleteMany({});
-    res.json({
-      success: true,
-      message: `Deleted ${result.deletedCount} orders.`,
-    });
+    res.json({ success: true, message: `Deleted ${result.deletedCount} orders.` });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error clearing orders" });
   }
 });
 
-// ===================== PATCH STATUS =====================
 app.patch("/api/orders/:id/status", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -675,54 +555,61 @@ app.patch("/api/orders/:id/status", verifyToken, async (req, res) => {
     const validStatuses = ["Pending", "Confirmed", "Cancelled", "Delivered"];
     if (!validStatuses.includes(status))
       return res.status(400).json({ message: "Invalid status" });
-
-    const order = await Order.findById(id);
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { orderStatus: status },
+      { new: true }
+    );
     if (!order) return res.status(404).json({ message: "Order not found" });
-
-    order.orderStatus = status;
-    await order.save();
-
-    if (status === "Delivered") {
-      const customerName = order.shippingAddress?.fullName || "Valued Customer";
-
-      const customerMail = {
-        from: `"Baroque Store" <${process.env.EMAIL_USER}>`,
-        to: order.userEmail,
-        subject: "Your Order has been Delivered! 🎉",
-        html: `
-          <p>Hi ${customerName},</p>
-          <p>Great news! Your order <strong>#${order._id}</strong> has been delivered.</p>
-          <p>Tracking ID: ${order.trackingId || "N/A"}</p>
-          <p>Thank you for shopping with us.</p>
-        `,
-      };
-      try {
-        await transporter.sendMail(customerMail);
-        console.log(`✅ Delivery email sent to ${order.userEmail}`);
-      } catch (emailErr) {
-        console.error(
-          "❌ Failed to send customer delivery email:",
-          emailErr.message,
-        );
-      }
-
-      const adminHtml = `
-        <p>Order <strong>${order._id}</strong> has been marked as <strong>Delivered</strong>.</p>
-        <p>Customer: ${customerName} (${order.userEmail})</p>
-        <p>Tracking ID: ${order.trackingId || "N/A"}</p>
-        <p><a href="${FRONTEND_URL}/orders">View Order</a></p>
-      `;
-      await sendAdminEmail("Order Delivered", adminHtml);
-    }
-
-    res.json({
-      success: true,
-      message: `Order status updated to ${status}`,
-      order,
-    });
+    res.json({ success: true, message: `Order status updated to ${status}`, order });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error updating order status" });
+  }
+});
+
+app.post("/api/admin/confirm-order/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+    order.orderStatus = "Confirmed";
+    if (!order.trackingId) {
+      order.trackingId = "TRK-" + Math.floor(100000 + Math.random() * 900000);
+    }
+    await order.save();
+    const customerName = order.shippingAddress?.fullName || "Valued Customer";
+    const mailOptions = {
+      from: '"Baroque Store" <ranazeshaan786456@gmail.com>',
+      to: order.userEmail,
+      subject: "Order Confirmed",
+      html: `<p>Hi ${customerName}, your order is confirmed. Tracking: ${order.trackingId}</p>`,
+    };
+    await transporter.sendMail(mailOptions).catch(() => {});
+    res.json({ success: true, message: "Order confirmed", updatedOrder: order });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+app.post("/api/admin/cancel-order/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+    order.orderStatus = "Cancelled";
+    await order.save();
+    const customerName = order.shippingAddress?.fullName || "Valued Customer";
+    const mailOptions = {
+      from: '"Baroque Store" <ranazeshaan786456@gmail.com>',
+      to: order.userEmail,
+      subject: "Order Cancelled",
+      html: `<p>Hi ${customerName}, your order has been cancelled.</p>`,
+    };
+    await transporter.sendMail(mailOptions).catch(() => {});
+    res.json({ success: true, message: "Order cancelled", updatedOrder: order });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
