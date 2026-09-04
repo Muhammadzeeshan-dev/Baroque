@@ -1,4 +1,4 @@
-require("dotenv").config();
+(require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -14,7 +14,7 @@ const app = express();
 
 // ===================== MIDDLEWARE =====================
 app.use(express.json());
-app.use(cors()); // यह नेटलीफ़ाई फ्रंटएंड को कनेक्ट करने की अनुमति देता है
+app.use(cors());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const uploadDir = path.join(__dirname, "uploads");
@@ -34,7 +34,7 @@ const MONGO_URI =
   "mongodb+srv://muhammadzeeshan7864x56_db_user:BDBNyWDDUnt7vHg1@cluster0.bdx7ndd.mongodb.net/?appName=Cluster0";
 console.log(
   "✅ MONGO_URI loaded (starts with:",
-  MONGO_URI.slice(0, 15) + "...)",
+  MONGO_URI.slice(0, 15) + "...",
 );
 
 mongoose
@@ -53,15 +53,18 @@ mongoose
 // ===================== NODEMAILER (FIXED) =====================
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.EMAIL_PORT) || 465,
-  secure: process.env.EMAIL_SECURE === "true", // true for 465
+  port: parseInt(process.env.EMAIL_PORT) || 587,
+  secure: process.env.EMAIL_SECURE === "true", // false for port 587
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
+  tls: {
+    rejectUnauthorized: false,
+  },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 15000,
 });
 
 transporter.verify((error, success) => {
@@ -77,7 +80,7 @@ transporter.verify((error, success) => {
 
 // ===================== ADMIN NOTIFICATION HELPER =====================
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000"; // change to your frontend URL
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const sendAdminEmail = async (subject, htmlContent) => {
   try {
@@ -664,7 +667,7 @@ app.delete("/api/orders/all", verifyToken, async (req, res) => {
   }
 });
 
-// ===================== FIXED: PATCH STATUS (now sends emails on "Delivered") =====================
+// ===================== PATCH STATUS =====================
 app.patch("/api/orders/:id/status", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -676,15 +679,12 @@ app.patch("/api/orders/:id/status", verifyToken, async (req, res) => {
     const order = await Order.findById(id);
     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    // Update status
     order.orderStatus = status;
     await order.save();
 
-    // ─── If status is "Delivered", send emails ───
     if (status === "Delivered") {
       const customerName = order.shippingAddress?.fullName || "Valued Customer";
 
-      // Customer email
       const customerMail = {
         from: `"Baroque Store" <${process.env.EMAIL_USER}>`,
         to: order.userEmail,
@@ -706,7 +706,6 @@ app.patch("/api/orders/:id/status", verifyToken, async (req, res) => {
         );
       }
 
-      // Admin notification
       const adminHtml = `
         <p>Order <strong>${order._id}</strong> has been marked as <strong>Delivered</strong>.</p>
         <p>Customer: ${customerName} (${order.userEmail})</p>
@@ -751,7 +750,7 @@ app.delete("/api/users/:id", verifyToken, async (req, res) => {
 });
 
 // ===================== START SERVER =====================
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, "0.0.0.0", () => {
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
