@@ -30,7 +30,8 @@ const upload = multer({ storage });
 
 // ===================== MONGO DB =====================
 const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/baroque_db";
+  process.env.MONGO_URI ||
+  "mongodb+srv://muhammadzeeshan7864x56_db_user:BDBNyWDDUnt7vHg1@cluster0.bdx7ndd.mongodb.net/?appName=Cluster0";
 console.log(
   "✅ MONGO_URI loaded (starts with:",
   MONGO_URI.slice(0, 15) + "...)",
@@ -42,7 +43,7 @@ mongoose
     bufferTimeoutMS: 60000,
   })
   .then(() => {
-    console.log("✅ MongoDB Local Connected Successfully!");
+    console.log("✅ MongoDB Atlas Connected Successfully!");
     seedAdmin();
   })
   .catch((err) => {
